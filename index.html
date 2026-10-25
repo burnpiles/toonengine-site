@@ -92,13 +92,14 @@ a:hover { color: var(--accent); }
 .eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 h1 {
   margin: 0;
-  font-size: clamp(36px, 7.4vw, 88px);
+  font-size: clamp(20px, calc((100vw - 32px) / 10.8), 88px);
   line-height: 1.02;
   font-weight: 800;
   letter-spacing: -.035em;
   text-wrap: balance;
 }
-h1 span { color: var(--accent); }
+h1 .line { display: block; white-space: nowrap; }
+h1 .dot-acc { color: var(--accent); }
 .lede { margin: 0; max-width: 58ch; color: var(--muted); font-size: 16px; }
 
 /* drawing sheet */
@@ -170,6 +171,19 @@ h2 { margin: 0; font-size: clamp(26px, 4vw, 40px); line-height: 1.1; font-weight
 .swatches button { min-width: 0; padding: 0; aspect-ratio: 1; justify-content: center; }
 .swatches button span { width: 60%; height: 60%; border-radius: 50%; border: 1px solid var(--ink); }
 .swatches button[aria-pressed="true"] { background: var(--panel); outline: 2px solid var(--accent); outline-offset: 1px; }
+.fs-btn { position: absolute; top: 10px; right: 10px; z-index: 2; font: inherit; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink); background: var(--panel); border: 1px solid var(--ink); padding: 5px 9px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.fs-btn:hover { border-color: var(--accent); color: var(--accent); }
+.fs-btn svg { width: 14px; height: 14px; }
+.fs-btn .i-close { display: none; }
+.studio.is-full .fs-btn .i-close { display: inline; }
+.studio.is-full .fs-btn .i-open { display: none; }
+.studio.is-full {
+  position: fixed; inset: 0; z-index: 100; border: 0; width: 100%; height: 100%; height: 100dvh;
+  grid-template-rows: minmax(0, 1fr);
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+.studio.is-full .canvas-box { aspect-ratio: auto; height: 100%; }
+html.pad-full, html.pad-full body { overflow: hidden; }
 .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .actions button { justify-content: center; }
 #clear { border-color: var(--accent); color: var(--accent); }
@@ -197,7 +211,16 @@ footer a { color: var(--ink); }
   .studio { grid-template-columns: minmax(0, 1fr); }
   .canvas-box { border-right: 0; border-bottom: 1.5px solid var(--ink); }
   .tools { flex-direction: row; flex-wrap: wrap; }
-  .group { flex: 1 1 140px; }
+  .tools { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; }
+  .tools .group:last-child { grid-column: 1 / -1; }
+  .group[aria-label="Color"] { display: flex; flex-direction: column; }
+  .swatches { flex: 1; max-width: none; grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(5, minmax(28px, 1fr)); }
+  .swatches button { aspect-ratio: auto; padding: 0 10px; }
+  .swatches button span { width: 100%; height: 55%; border-radius: 999px; }
+  .studio.is-full { grid-template-rows: minmax(0, 1fr) auto; }
+  .studio.is-full .tools { padding: 10px; gap: 8px; }
+  .studio.is-full .group > small { display: none; }
+  .studio.is-full .tools button { padding: 4px 8px; }
   .contact .wrap { grid-template-columns: minmax(0, 1fr); }
   .hero .wrap { padding-block: 36px 20px; }
   footer .wrap { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; }
@@ -224,7 +247,7 @@ footer a { color: var(--ink); }
   <section class="hero">
     <div class="wrap">
       <div class="eyebrow">Sheet A-01 / Pipeline overview</div>
-      <h1>Built for artists.<br>Scaled by AI<span>.</span></h1>
+      <h1><span class="line">Built for artists.</span><span class="line">Scaled by AI<span class="dot-acc">.</span></span></h1>
       <p class="lede">Live action goes in. Animation comes out, in the style the artist sets. We're keeping the rest under wraps for now.</p>
 
       <div>
@@ -381,6 +404,7 @@ footer a { color: var(--ink); }
         <div class="canvas-box">
           <canvas id="pad" aria-label="Drawing canvas"></canvas>
           <div class="hint" id="hint">Draw anywhere</div>
+          <button type="button" class="fs-btn" id="fsBtn" aria-label="Full screen"><svg viewBox="0 0 20 20" aria-hidden="true"><path class="i-open" d="M3,8 V3 H8 M12,3 H17 V8 M17,12 V17 H12 M8,17 H3 V12" fill="none" stroke="currentColor" stroke-width="1.6"/><path class="i-close" d="M8,3 V8 H3 M17,8 H12 V3 M12,17 V12 H17 M3,12 H8 V17" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span id="fsLabel">Full screen</span></button>
         </div>
         <div class="tools">
           <div class="group" role="group" aria-label="Tool">
@@ -596,6 +620,33 @@ footer a { color: var(--ink); }
   new ResizeObserver(resize).observe(box);
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', schedule);
   new MutationObserver(schedule).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  /* ---------- full screen ---------- */
+  var studio = document.querySelector('.studio');
+  var fsBtn = document.getElementById('fsBtn');
+  var fsLabel = document.getElementById('fsLabel');
+  function setFull(on) {
+    studio.classList.toggle('is-full', on);
+    document.documentElement.classList.toggle('pad-full', on);
+    fsLabel.textContent = on ? 'Exit' : 'Full screen';
+    fsBtn.setAttribute('aria-label', on ? 'Exit full screen' : 'Full screen');
+    resize();
+  }
+  function nativeEl() { return document.fullscreenElement || document.webkitFullscreenElement; }
+  fsBtn.addEventListener('click', function () {
+    if (studio.classList.contains('is-full')) {
+      if (nativeEl()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); }
+      else setFull(false);
+      return;
+    }
+    var req = studio.requestFullscreen || studio.webkitRequestFullscreen;
+    setFull(true);   // the overlay works everywhere; native full screen hides browser chrome where allowed
+    if (req) { try { var r = req.call(studio); if (r && r.catch) r.catch(function () {}); } catch (err) {} }
+  });
+  function onNativeChange() { if (!nativeEl() && studio.classList.contains('is-full')) setFull(false); }
+  document.addEventListener('fullscreenchange', onNativeChange);
+  document.addEventListener('webkitfullscreenchange', onNativeChange);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && studio.classList.contains('is-full') && !nativeEl()) setFull(false); });
 
   /* ---------- light / dark toggle ---------- */
   var root = document.documentElement;

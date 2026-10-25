@@ -167,7 +167,20 @@ h2 { margin: 0; font-size: clamp(26px, 4vw, 40px); line-height: 1.1; font-weight
 .tools button:hover { background: var(--grid); }
 .tools button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
 .tools button svg { width: 18px; height: 18px; flex: none; }
-.swatches { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; max-width: 220px; }
+.swatches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; max-width: 220px; }
+.swatch-custom span { position: relative; background: conic-gradient(#f33, #fd3, #3d5, #3cf, #36f, #c3f, #f33); }
+.swatch-custom span::after { content: ""; position: absolute; inset: 26%; border-radius: inherit; background: var(--custom, #7A5CFF); border: 1px solid var(--ink); }
+.studio { position: relative; }
+.picker { position: absolute; z-index: 5; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 252px; max-width: calc(100% - 24px); background: var(--panel); border: 1.5px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: 14px; display: grid; gap: 12px; }
+.picker-head { display: flex; justify-content: space-between; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+#wheel { width: 220px; height: 220px; max-width: 100%; display: block; margin: 0 auto; touch-action: none; cursor: crosshair; }
+.picker-row { display: flex; align-items: center; gap: 8px; }
+.picker-preview { width: 30px; height: 30px; flex: none; border: 1px solid var(--ink); }
+.picker-row label { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+#hexInput { font: inherit; font-size: 15px; width: 100%; min-width: 0; color: var(--ink); background: var(--paper); border: 1px solid var(--ink); padding: 5px 8px; text-transform: uppercase; }
+#hexInput.bad { border-color: var(--accent); }
+.pick-done { font: inherit; font-size: 13px; padding: 7px; border: 1.5px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; }
+.pick-done:hover { background: var(--accent); border-color: var(--accent); color: #111; }
 .swatches button { min-width: 0; padding: 0; aspect-ratio: 1; justify-content: center; }
 .swatches button span { width: 60%; height: 60%; border-radius: 50%; border: 1px solid var(--ink); }
 .swatches button[aria-pressed="true"] { background: var(--panel); outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -189,19 +202,23 @@ html.pad-full, html.pad-full body { overflow: hidden; }
 #clear { border-color: var(--accent); color: var(--accent); }
 
 /* contact */
-.contact .wrap { padding-block: 72px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: end; }
-.mailrow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.email { font-size: clamp(17px, 2.4vw, 24px); font-weight: 700; user-select: all; overflow-wrap: anywhere; }
+.contact .wrap { padding-block: 72px; display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); grid-template-areas: "eye ." "head mail"; column-gap: 32px; row-gap: 12px; align-items: center; }
+.contact-eye { grid-area: eye; }
+.contact h2 { grid-area: head; font-size: clamp(18px, calc((min(100vw, 1120px) - 64px) * .58 / 16.6), 38px); }
+.contact h2 .line { display: block; white-space: nowrap; }
+.mailblock { grid-area: mail; display: grid; gap: 12px; justify-items: start; }
+.mailbtns { display: flex; gap: 10px; flex-wrap: wrap; }
+.email { font-size: clamp(15px, calc((min(100vw, 1120px) - 64px) * .4 / 15.5), 22px); font-weight: 700; user-select: all; white-space: nowrap; }
 .btn { font: inherit; font-size: 13px; padding: 8px 14px; border: 1.5px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; text-decoration: none; display: inline-block; }
 .btn.ghost { background: transparent; color: var(--ink); }
 .btn:hover { background: var(--accent); border-color: var(--accent); color: #111; }
 
 footer { border-top: 1px solid var(--ink); }
-footer .wrap { padding-block: 40px; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 24px; font-size: 13px; color: var(--muted); }
-.foot-icon { display: flex; justify-content: center; }
-.hero-icon { width: 96px; height: 96px; display: block; }
-.foot-copy { text-align: right; }
-footer a { color: var(--ink); }
+footer .wrap { padding-block: 40px; display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: center; gap: 24px; font-size: 13px; color: var(--muted); }
+.foot-text { white-space: nowrap; }
+.foot-mark { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.hero-icon { width: 80px; height: 80px; display: block; }
+footer a { color: var(--ink); white-space: nowrap; }
 
 @media (max-width: 760px) {
   .titleblock { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -214,18 +231,22 @@ footer a { color: var(--ink); }
   .tools { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; }
   .tools .group:last-child { grid-column: 1 / -1; }
   .group[aria-label="Color"] { display: flex; flex-direction: column; }
-  .swatches { flex: 1; max-width: none; grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(5, minmax(28px, 1fr)); }
+  .swatches { flex: 1; max-width: none; grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(6, minmax(26px, 1fr)); }
   .swatches button { aspect-ratio: auto; padding: 0 10px; }
   .swatches button span { width: 100%; height: 55%; border-radius: 999px; }
+  .swatch-custom span { background: linear-gradient(90deg, #f33, #fd3, #3d5, #3cf, #36f, #c3f); }
+  .swatch-custom span::after { inset: -1px -1px -1px auto; width: 38%; }
   .studio.is-full { grid-template-rows: minmax(0, 1fr) auto; }
   .studio.is-full .tools { padding: 10px; gap: 8px; }
   .studio.is-full .group > small { display: none; }
   .studio.is-full .tools button { padding: 4px 8px; }
-  .contact .wrap { grid-template-columns: minmax(0, 1fr); }
+  .contact .wrap { grid-template-columns: minmax(0, 1fr); grid-template-areas: "eye" "head" "mail"; row-gap: 16px; padding-block: 56px; }
+  .contact h2 { font-size: clamp(16px, calc((100vw - 32px) / 17), 38px); }
+  .email { font-size: clamp(14px, calc((100vw - 32px) / 15.5), 22px); }
   .hero .wrap { padding-block: 36px 20px; }
-  footer .wrap { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; }
-  .foot-icon { order: -1; }
-  .foot-copy { text-align: center; }
+  footer .wrap { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; gap: 20px; }
+  .foot-text { white-space: normal; max-width: 34ch; }
+  .foot-mark { align-items: center; }
 }
 @media (prefers-reduced-motion: reduce) {
   .dot, .flow, .pulse { animation: none; }
@@ -401,6 +422,12 @@ footer a { color: var(--ink); }
       <p class="note">Your drawing stays on this screen. Nothing is saved.</p>
 
       <div class="studio">
+        <div class="picker" id="picker" role="dialog" aria-label="Pick any color" hidden>
+          <div class="picker-head"><span>Custom color</span><span>Any hex</span></div>
+          <canvas id="wheel" width="220" height="220" aria-label="Color wheel"></canvas>
+          <div class="picker-row"><span class="picker-preview" id="pickPreview"></span><label for="hexInput">Hex</label><input id="hexInput" type="text" maxlength="7" spellcheck="false" autocomplete="off" inputmode="text"></div>
+          <button type="button" class="pick-done" id="pickDone">Done</button>
+        </div>
         <div class="canvas-box">
           <canvas id="pad" aria-label="Drawing canvas"></canvas>
           <div class="hint" id="hint">Draw anywhere</div>
@@ -422,6 +449,7 @@ footer a { color: var(--ink); }
               <button type="button" id="c-pink" data-color="pink" aria-label="Pink" aria-pressed="false"><span style="background:#FF4F9A"></span></button>
               <button type="button" id="c-cyan" data-color="cyan" aria-label="Cyan" aria-pressed="false"><span style="background:#19B5D8"></span></button>
               <button type="button" id="c-yellow" data-color="yellow" aria-label="Yellow" aria-pressed="false"><span style="background:#FFC93C"></span></button>
+              <button type="button" id="c-custom" class="swatch-custom" data-color="custom" aria-label="Pick any color" aria-pressed="false"><span></span></button>
             </div>
           </div>
           <div class="group">
@@ -438,14 +466,14 @@ footer a { color: var(--ink); }
 
   <section class="contact" aria-labelledby="contact-title">
     <div class="wrap">
-      <div>
-        <div class="eyebrow">Early access</div>
-        <h2 id="contact-title">Artists, studios, and press: get in touch.</h2>
-      </div>
-      <div class="mailrow">
+      <div class="eyebrow contact-eye">Early access</div>
+      <h2 id="contact-title"><span class="line">Artists, studios, and press:</span><span class="line">get in touch.</span></h2>
+      <div class="mailblock">
         <span class="email" id="email">toonengine@burnpiles.com</span>
-        <button type="button" class="btn ghost" id="copy">Copy</button>
-        <a class="btn" href="mailto:toonengine@burnpiles.com?subject=Toon%20Engine%20early%20access">Email us</a>
+        <div class="mailbtns">
+          <button type="button" class="btn ghost" id="copy">Copy</button>
+          <a class="btn" href="mailto:toonengine@burnpiles.com?subject=Toon%20Engine%20early%20access">Email us</a>
+        </div>
       </div>
     </div>
   </section>
@@ -453,9 +481,8 @@ footer a { color: var(--ink); }
 
 <footer>
   <div class="wrap">
-    <span>Toon Engine is a product of <a href="https://upon.dev" target="_blank" rel="noopener">Upon Dev</a>, a division of <a href="https://burnpiles.com" target="_blank" rel="noopener">Burnpiles</a>.</span>
-    <span class="foot-icon"><svg class="hero-icon" role="img" aria-label="Toon Engine" viewBox="0 0 32 32" xmlns:c2pa="http://c2pa.org/manifest"><metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTplZDNhYmE2Yy04ZjJjLTRkYTUtYWY1OS1jYzJiMTNmNmYxYzcAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaFx+rXAVly+LotkqwYbtYmIAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDo0NTRkNzZkMS03OGMyLTQ2MGItOGIwMy05YmVhMjdjZmNhYzFscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoQjRdf6zWPzZjqHyiRITGxAAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFgg2P6r83AamnIyGK7JfOkUGiuscsyHyNtP0HVpdkC6FGikZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaNemOmvo6N3FB0mINtqUSoEAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRNAAAAAAAAAAAAAAAAAGRoYXNoWCA4iIfROPmbIEvk2fQvc5m8BCqKG0uWDmOf/c2lkoEuDmRuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBh7Zmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOmVkM2FiYTZjLThmMmMtNGRhNS1hZjU5LWNjMmIxM2Y2ZjFjNy9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjQ0MzU1NjBjLTk2YWQtNGNkNi1hYThlLTJjYjUxMTc2OGU2MnJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCDY/qvzcBqacjIYrsl86RQaK6xyzIfI20/QdWl2QLoUaKJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggsAgfFNavRQhjeolXq0mvTAKQlCvDZsK85uJACX+Xi2eiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFgg90LGSIFw8lY/RYrwC/KAUaKdL2T8tZB5nCk4odeoSBd0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQHxQ9P2w3LDNsxibDyEyQWQOvLbmWd16ba5oyPh/BwaloitSpKcwhGfC/6PcIbK6PINNCJeiEzV81m7nhV0PlxY=</c2pa:manifest></metadata><defs><clipPath id="c-hero-icon"><rect width="32" height="32" rx="7"/></clipPath></defs><g clip-path="url(#c-hero-icon)"><rect width="32" height="32" fill="#FF5A1F"/><g stroke="#111" stroke-width="1.6" stroke-linejoin="round" fill="#F6F4EE"><path d="M13,20 C9.5,14 8.5,3.5 11.5,2.5 C14.5,1.5 15.2,12 15,20 Z"/><path d="M19,20 C22.5,14 23.5,3.5 20.5,2.5 C17.5,1.5 16.8,12 17,20 Z"/><circle cx="16" cy="30" r="10"/></g><path d="M12.9,16 C11.3,11 11,5.5 12,5 C13.2,4.6 13.6,10 13.6,16 Z" fill="#FF5A1F"/><path d="M19.1,16 C20.7,11 21,5.5 20,5 C18.8,4.6 18.4,10 18.4,16 Z" fill="#FF5A1F"/><circle cx="12.6" cy="26" r="1.3" fill="#111"/><circle cx="19.4" cy="26" r="1.3" fill="#111"/></g></svg></span>
-    <span class="foot-copy">&copy; 2026 Burnpiles</span>
+    <span class="foot-text">Toon Engine is a product of <a href="https://upon.dev" target="_blank" rel="noopener">Upon Dev</a>, a division of <a href="https://burnpiles.com" target="_blank" rel="noopener">Burnpiles</a>.</span>
+    <div class="foot-mark"><svg class="hero-icon" role="img" aria-label="Toon Engine" viewBox="0 0 32 32" xmlns:c2pa="http://c2pa.org/manifest"><metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTplZDNhYmE2Yy04ZjJjLTRkYTUtYWY1OS1jYzJiMTNmNmYxYzcAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaFx+rXAVly+LotkqwYbtYmIAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDo0NTRkNzZkMS03OGMyLTQ2MGItOGIwMy05YmVhMjdjZmNhYzFscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoQjRdf6zWPzZjqHyiRITGxAAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFgg2P6r83AamnIyGK7JfOkUGiuscsyHyNtP0HVpdkC6FGikZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaNemOmvo6N3FB0mINtqUSoEAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRNAAAAAAAAAAAAAAAAAGRoYXNoWCA4iIfROPmbIEvk2fQvc5m8BCqKG0uWDmOf/c2lkoEuDmRuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBh7Zmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOmVkM2FiYTZjLThmMmMtNGRhNS1hZjU5LWNjMmIxM2Y2ZjFjNy9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjQ0MzU1NjBjLTk2YWQtNGNkNi1hYThlLTJjYjUxMTc2OGU2MnJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCDY/qvzcBqacjIYrsl86RQaK6xyzIfI20/QdWl2QLoUaKJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggsAgfFNavRQhjeolXq0mvTAKQlCvDZsK85uJACX+Xi2eiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFgg90LGSIFw8lY/RYrwC/KAUaKdL2T8tZB5nCk4odeoSBd0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQHxQ9P2w3LDNsxibDyEyQWQOvLbmWd16ba5oyPh/BwaloitSpKcwhGfC/6PcIbK6PINNCJeiEzV81m7nhV0PlxY=</c2pa:manifest></metadata><defs><clipPath id="c-hero-icon"><rect width="32" height="32" rx="7"/></clipPath></defs><g clip-path="url(#c-hero-icon)"><rect width="32" height="32" fill="#FF5A1F"/><g stroke="#111" stroke-width="1.6" stroke-linejoin="round" fill="#F6F4EE"><path d="M13,20 C9.5,14 8.5,3.5 11.5,2.5 C14.5,1.5 15.2,12 15,20 Z"/><path d="M19,20 C22.5,14 23.5,3.5 20.5,2.5 C17.5,1.5 16.8,12 17,20 Z"/><circle cx="16" cy="30" r="10"/></g><path d="M12.9,16 C11.3,11 11,5.5 12,5 C13.2,4.6 13.6,10 13.6,16 Z" fill="#FF5A1F"/><path d="M19.1,16 C20.7,11 21,5.5 20,5 C18.8,4.6 18.4,10 18.4,16 Z" fill="#FF5A1F"/><circle cx="12.6" cy="26" r="1.3" fill="#111"/><circle cx="19.4" cy="26" r="1.3" fill="#111"/></g></svg><span class="foot-copy">&copy; 2026 Burnpiles</span></div>
   </div>
 </footer>
 
@@ -512,10 +539,10 @@ footer a { color: var(--ink); }
   var COLORS = { pink: '#FF4F9A', cyan: '#19B5D8', yellow: '#FFC93C' };
   var SIZES = { pen: 3, marker: 13, eraser: 30, spray: 18 };
   var items = [];          // strokes and clear markers; coords normalized to canvas width
-  var cur = null, tool = 'pen', color = 'ink', W = 1, sprayTimer = null, lastPt = null, raf = 0;
+  var cur = null, tool = 'pen', color = 'ink', selColor = 'ink', customHex = '#7A5CFF', W = 1, sprayTimer = null, lastPt = null, raf = 0;
 
   function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
-  function resolve(c) { return c === 'ink' ? cssVar('--ink') : c === 'orange' ? cssVar('--accent') : COLORS[c]; }
+  function resolve(c) { return c.charAt(0) === '#' ? c : c === 'ink' ? cssVar('--ink') : c === 'orange' ? cssVar('--accent') : COLORS[c]; }
 
   function resize() {
     var r = box.getBoundingClientRect();
@@ -605,8 +632,10 @@ footer a { color: var(--ink); }
   });
   document.querySelectorAll('[data-color]').forEach(function (b) {
     b.addEventListener('click', function () {
-      color = b.dataset.color; press('[data-color]', 'color', color);
+      selColor = b.dataset.color; press('[data-color]', 'color', selColor);
+      color = selColor === 'custom' ? customHex : selColor;
       if (tool === 'eraser') { tool = 'pen'; press('[data-tool]', 'tool', tool); }
+      if (selColor === 'custom') openPicker(); else if (!picker.hidden) closePicker();
     });
   });
   function undo() { items.pop(); schedule(); }
@@ -620,6 +649,112 @@ footer a { color: var(--ink); }
   new ResizeObserver(resize).observe(box);
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', schedule);
   new MutationObserver(schedule).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+
+  /* ---------- custom color wheel ---------- */
+  var picker = document.getElementById('picker');
+  var wheel = document.getElementById('wheel');
+  var wctx = wheel.getContext('2d');
+  var hexInput = document.getElementById('hexInput');
+  var pickPreview = document.getElementById('pickPreview');
+  var customBtn = document.getElementById('c-custom');
+  var WS = 220, C = WS / 2, R_OUT = 108, R_IN = 86, SQ = 116, SQ0 = C - SQ / 2;
+  var hsv = { h: 255, s: .64, v: 1 };
+  function hsvToRgb(h, s, v) {
+    var f = function (n) { var k = (n + h / 60) % 6; return v - v * s * Math.max(0, Math.min(k, 4 - k, 1)); };
+    return [f(5), f(3), f(1)].map(function (x) { return Math.round(x * 255); });
+  }
+  function rgbToHsv(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    var mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn, h = 0;
+    if (d) { h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; if (h < 0) h += 360; }
+    return { h: h, s: mx ? d / mx : 0, v: mx };
+  }
+  function toHex(rgb) { return '#' + rgb.map(function (x) { return x.toString(16).padStart(2, '0'); }).join('').toUpperCase(); }
+  function parseHex(t) {
+    t = t.trim().replace(/^#/, '');
+    if (/^[0-9a-f]{3}$/i.test(t)) t = t.split('').map(function (c) { return c + c; }).join('');
+    if (!/^[0-9a-f]{6}$/i.test(t)) return null;
+    return [0, 2, 4].map(function (i) { return parseInt(t.substr(i, 2), 16); });
+  }
+  function sizeWheel() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    wheel.width = WS * dpr; wheel.height = WS * dpr;
+    wctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function drawWheel() {
+    wctx.clearRect(0, 0, WS, WS);
+    for (var d = 0; d < 360; d++) {
+      wctx.beginPath();
+      wctx.strokeStyle = 'hsl(' + d + ',100%,50%)';
+      wctx.lineWidth = R_OUT - R_IN;
+      wctx.arc(C, C, (R_OUT + R_IN) / 2, (d - 90.6) * Math.PI / 180, (d - 89) * Math.PI / 180);
+      wctx.stroke();
+    }
+    wctx.fillStyle = 'hsl(' + hsv.h + ',100%,50%)';
+    wctx.fillRect(SQ0, SQ0, SQ, SQ);
+    var gw = wctx.createLinearGradient(SQ0, 0, SQ0 + SQ, 0);
+    gw.addColorStop(0, '#fff'); gw.addColorStop(1, 'rgba(255,255,255,0)');
+    wctx.fillStyle = gw; wctx.fillRect(SQ0, SQ0, SQ, SQ);
+    var gb = wctx.createLinearGradient(0, SQ0, 0, SQ0 + SQ);
+    gb.addColorStop(0, 'rgba(0,0,0,0)'); gb.addColorStop(1, '#000');
+    wctx.fillStyle = gb; wctx.fillRect(SQ0, SQ0, SQ, SQ);
+    var a = (hsv.h - 90) * Math.PI / 180, rm = (R_OUT + R_IN) / 2;
+    marker(C + Math.cos(a) * rm, C + Math.sin(a) * rm);
+    marker(SQ0 + hsv.s * SQ, SQ0 + (1 - hsv.v) * SQ);
+  }
+  function marker(x, y) {
+    wctx.beginPath(); wctx.arc(x, y, 7, 0, Math.PI * 2);
+    wctx.lineWidth = 3; wctx.strokeStyle = '#fff'; wctx.stroke();
+    wctx.lineWidth = 1.5; wctx.strokeStyle = '#111'; wctx.stroke();
+  }
+  function applyHsv(fromInput) {
+    var hex = toHex(hsvToRgb(hsv.h, hsv.s, hsv.v));
+    customHex = hex;
+    if (selColor === 'custom') color = hex;
+    customBtn.style.setProperty('--custom', hex);
+    pickPreview.style.background = hex;
+    if (!fromInput) hexInput.value = hex;
+    drawWheel();
+  }
+  var wheelMode = null;
+  function wheelPoint(e) {
+    var r = wheel.getBoundingClientRect();
+    return [(e.clientX - r.left) * WS / r.width, (e.clientY - r.top) * WS / r.height];
+  }
+  function wheelUpdate(p) {
+    if (wheelMode === 'hue') {
+      var deg = Math.atan2(p[1] - C, p[0] - C) * 180 / Math.PI + 90;
+      hsv.h = (deg + 360) % 360;
+    } else if (wheelMode === 'sv') {
+      hsv.s = Math.min(1, Math.max(0, (p[0] - SQ0) / SQ));
+      hsv.v = Math.min(1, Math.max(0, 1 - (p[1] - SQ0) / SQ));
+    }
+    applyHsv(false);
+  }
+  wheel.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    var p = wheelPoint(e), d = Math.hypot(p[0] - C, p[1] - C);
+    if (d >= R_IN - 4 && d <= R_OUT + 6) wheelMode = 'hue';
+    else if (p[0] >= SQ0 - 6 && p[0] <= SQ0 + SQ + 6 && p[1] >= SQ0 - 6 && p[1] <= SQ0 + SQ + 6) wheelMode = 'sv';
+    else return;
+    wheel.setPointerCapture(e.pointerId);
+    wheelUpdate(p);
+  });
+  wheel.addEventListener('pointermove', function (e) { if (wheelMode) wheelUpdate(wheelPoint(e)); });
+  wheel.addEventListener('pointerup', function () { wheelMode = null; });
+  wheel.addEventListener('pointercancel', function () { wheelMode = null; });
+  hexInput.addEventListener('input', function () {
+    var rgb = parseHex(hexInput.value);
+    hexInput.classList.toggle('bad', !rgb && hexInput.value.trim() !== '');
+    if (rgb) { hsv = rgbToHsv(rgb[0], rgb[1], rgb[2]); applyHsv(true); }
+  });
+  hexInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') closePicker(); });
+  function openPicker() { picker.hidden = false; sizeWheel(); applyHsv(false); }
+  function closePicker() { picker.hidden = true; hexInput.classList.remove('bad'); customBtn.focus(); }
+  document.getElementById('pickDone').addEventListener('click', closePicker);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !picker.hidden) { e.stopPropagation(); closePicker(); } }, true);
+  applyHsv(false);
 
   /* ---------- full screen ---------- */
   var studio = document.querySelector('.studio');

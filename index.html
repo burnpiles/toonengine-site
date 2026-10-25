@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Toon Engine. Built for artists. Scaled by AI. Coming soon.">
+<meta name="theme-color" content="#F6F4EE">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23FF5A1F'/%3E%3C/svg%3E">
+<title>Toon Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
+<style>
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+/* Layout: one drafting sheet per section (A-01 schematic, A-02 scratch pad), left-aligned, title-block details as real content */
+:root {
+  --paper: #F6F4EE;
+  --panel: #FBFAF6;
+  --ink: #111111;
+  --muted: #6E6A60;
+  --grid: #E6E2D8;
+  --accent: #FF5A1F;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #131311; --panel: #191917; --ink: #ECE9E1; --muted: #9A958A; --grid: #24231F; --accent: #FF6A33;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #131311; --panel: #191917; --ink: #ECE9E1; --muted: #9A958A; --grid: #24231F; --accent: #FF6A33;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration-color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 2px; }
+a:hover { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* top bar */
+.bar { border-bottom: 1px solid var(--ink); }
+.bar .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-block: 14px; flex-wrap: wrap; }
+.mark { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .02em; font-size: 16px; }
+.mark i { width: 12px; height: 12px; background: var(--accent); display: inline-block; }
+.status { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; color: var(--muted); }
+.status b { color: var(--ink); font-weight: 500; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: blink 1.6s steps(2, start) infinite; }
+@keyframes blink { to { visibility: hidden; } }
+
+/* hero */
+.hero .wrap { padding-block: 56px 28px; display: grid; gap: 20px; }
+.eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+h1 {
+  margin: 0;
+  font-size: clamp(36px, 7.4vw, 88px);
+  line-height: 1.02;
+  font-weight: 800;
+  letter-spacing: -.035em;
+  text-wrap: balance;
+}
+h1 span { color: var(--accent); }
+.lede { margin: 0; max-width: 58ch; color: var(--muted); font-size: 16px; }
+
+/* drawing sheet */
+.sheet {
+  border: 1.5px solid var(--ink);
+  background-color: var(--panel);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: -1px -1px;
+}
+.schematic { display: block; width: 100%; height: auto; max-width: 100%; }
+.schematic text { font-family: var(--mono); fill: var(--ink); }
+.schematic .muted { fill: var(--muted); }
+.st { stroke: var(--ink); fill: none; stroke-width: 1.5; }
+.st-thin { stroke: var(--ink); fill: none; stroke-width: 1; }
+.fill-paper { fill: var(--panel); }
+.fill-ink { fill: var(--ink); }
+.fill-acc { fill: var(--accent); }
+.st-acc { stroke: var(--accent); fill: none; }
+.led { fill: var(--panel); stroke: var(--ink); stroke-width: 1; transition: fill .15s; }
+.led.on { fill: var(--accent); stroke: var(--accent); }
+.flow { stroke-dasharray: 4 8; animation: flow 1.2s linear infinite; }
+@keyframes flow { to { stroke-dashoffset: -12; } }
+.pulse { transform-origin: 70px 95px; transform-box: view-box; animation: pulse 2.4s ease-out infinite; }
+@keyframes pulse { 0% { opacity: .9; transform: scale(1); } 70%,100% { opacity: 0; transform: scale(1.9); } }
+
+.titleblock {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  border: 1.5px solid var(--ink);
+  border-top: 0;
+  background: var(--panel);
+}
+.titleblock div { padding: 8px 12px; border-left: 1px solid var(--ink); min-width: 0; }
+.titleblock div:first-child { border-left: 0; }
+.titleblock small { display: block; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.titleblock span { font-size: 13px; font-weight: 500; overflow-wrap: anywhere; }
+.titleblock .conf span { color: var(--accent); }
+
+/* pad section */
+.pad .wrap { padding-block: 72px 24px; display: grid; gap: 20px; }
+h2 { margin: 0; font-size: clamp(26px, 4vw, 40px); line-height: 1.1; font-weight: 800; letter-spacing: -.025em; text-wrap: balance; }
+.note { margin: 0; color: var(--muted); max-width: 60ch; }
+.studio { display: grid; grid-template-columns: minmax(0, 1fr) 168px; border: 1.5px solid var(--ink); background: var(--panel); }
+.canvas-box { position: relative; aspect-ratio: 3 / 2; max-width: 100%; border-right: 1.5px solid var(--ink); background: var(--panel); touch-action: none; overflow: hidden; }
+.canvas-box::before, .canvas-box::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--muted); border-style: solid; pointer-events: none;
+}
+.canvas-box::before { top: 12px; left: 12px; border-width: 1px 0 0 1px; }
+.canvas-box::after { bottom: 12px; right: 12px; border-width: 0 1px 1px 0; }
+.hint { position: absolute; left: 16px; bottom: 12px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); pointer-events: none; transition: opacity .3s; }
+.hint.gone { opacity: 0; }
+#pad { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; }
+
+.tools { display: flex; flex-direction: column; gap: 14px; padding: 14px; }
+.group { display: grid; gap: 6px; align-content: start; }
+.group > small { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.tools button {
+  font: inherit; font-size: 13px; color: var(--ink); background: var(--panel);
+  border: 1px solid var(--ink); padding: 6px 10px; text-align: left; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+}
+.tools button:hover { background: var(--grid); }
+.tools button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+.tools button svg { width: 18px; height: 18px; flex: none; }
+.swatches { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; max-width: 220px; }
+.swatches button { min-width: 0; padding: 0; aspect-ratio: 1; justify-content: center; }
+.swatches button span { width: 60%; height: 60%; border-radius: 50%; border: 1px solid var(--ink); }
+.swatches button[aria-pressed="true"] { background: var(--panel); outline: 2px solid var(--accent); outline-offset: 1px; }
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.actions button { justify-content: center; }
+#clear { border-color: var(--accent); color: var(--accent); }
+
+/* contact */
+.contact .wrap { padding-block: 72px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: end; }
+.mailrow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.email { font-size: clamp(17px, 2.4vw, 24px); font-weight: 700; user-select: all; overflow-wrap: anywhere; }
+.btn { font: inherit; font-size: 13px; padding: 8px 14px; border: 1.5px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; text-decoration: none; display: inline-block; }
+.btn.ghost { background: transparent; color: var(--ink); }
+.btn:hover { background: var(--accent); border-color: var(--accent); color: #111; }
+
+footer { border-top: 1px solid var(--ink); }
+footer .wrap { padding-block: 22px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); }
+footer a { color: var(--ink); }
+
+@media (max-width: 760px) {
+  .titleblock { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .titleblock div { border-top: 1px solid var(--ink); }
+  .titleblock div:nth-child(-n+2) { border-top: 0; }
+  .titleblock div:nth-child(odd) { border-left: 0; }
+  .studio { grid-template-columns: minmax(0, 1fr); }
+  .canvas-box { border-right: 0; border-bottom: 1.5px solid var(--ink); }
+  .tools { flex-direction: row; flex-wrap: wrap; }
+  .group { flex: 1 1 140px; }
+  .contact .wrap { grid-template-columns: minmax(0, 1fr); }
+  .hero .wrap { padding-block: 36px 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dot, .flow, .pulse { animation: none; }
+  .pulse { opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+
+<header class="bar">
+  <div class="wrap">
+    <div class="mark"><i aria-hidden="true"></i>toonengine.ai</div>
+    <div class="status"><span class="dot" aria-hidden="true"></span><b>In stealth</b> / Coming soon</div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Sheet A-01 / Pipeline overview</div>
+      <h1>Built for artists.<br>Scaled by AI<span>.</span></h1>
+      <p class="lede">Live action goes in. Animation comes out, in the style the artist sets. We're keeping the rest under wraps for now.</p>
+
+      <div>
+        <div class="sheet">
+          <svg class="schematic" viewBox="0 0 1000 415" role="img" aria-label="Schematic: a live-action figure walks through three stations and comes out as a cartoon character.">
+            <defs>
+              <!-- stage 0: live-action figure, solid like a floor-plan person -->
+              <symbol id="s0" overflow="visible">
+                <g class="fill-ink">
+                  <circle cx="0" cy="-99" r="11"/>
+                  <path d="M-14,-85 Q0,-89 14,-85 L18,-46 L11,-46 L10,-36 L9,0 L1.5,0 L0,-34 L-1.5,0 L-9,0 L-10,-36 L-11,-46 L-18,-46 Z"/>
+                </g>
+              </symbol>
+              <!-- stage 1: pose capture, skeleton with joints -->
+              <symbol id="s1" overflow="visible">
+                <rect x="-26" y="-116" width="52" height="118" class="st-thin" stroke-dasharray="3 4" opacity=".5"/>
+                <g class="st" stroke-linecap="round">
+                  <circle cx="0" cy="-99" r="10"/>
+                  <path d="M0,-89 V-48 M-14,-84 H14 M-14,-84 L-18,-50 M14,-84 L18,-50 M-8,-48 H8 M-8,-48 L-9,0 M8,-48 L9,0"/>
+                </g>
+                <g class="fill-acc">
+                  <circle cx="-14" cy="-84" r="3"/><circle cx="14" cy="-84" r="3"/>
+                  <circle cx="-18" cy="-50" r="3"/><circle cx="18" cy="-50" r="3"/>
+                  <circle cx="-8" cy="-48" r="3"/><circle cx="8" cy="-48" r="3"/>
+                  <circle cx="-9" cy="0" r="3"/><circle cx="9" cy="0" r="3"/>
+                  <circle cx="0" cy="-89" r="3"/>
+                </g>
+              </symbol>
+              <!-- stage 2: construction sketch -->
+              <symbol id="s2" overflow="visible">
+                <g class="st-acc" stroke-width="1.6" stroke-linecap="round">
+                  <ellipse cx="0" cy="-92" rx="16" ry="18"/>
+                  <path d="M-16,-92 H16 M0,-110 Q6,-92 0,-74"/>
+                  <ellipse cx="-7" cy="-127" rx="5" ry="21" transform="rotate(-6 -7 -127)"/>
+                  <ellipse cx="7" cy="-127" rx="5" ry="21" transform="rotate(6 7 -127)"/>
+                  <ellipse cx="0" cy="-55" rx="15" ry="20"/>
+                  <path d="M-12,-68 Q-18,-56 -19,-44 M12,-68 Q18,-56 19,-44 M-6,-36 V-10 M6,-36 V-10"/>
+                  <ellipse cx="-9" cy="-5" rx="10" ry="5"/><ellipse cx="9" cy="-5" rx="10" ry="5"/>
+                </g>
+                <path class="st-thin" d="M-24,-148 H24 M-24,0 H24" stroke-dasharray="2 4" opacity=".55"/>
+              </symbol>
+              <!-- stage 3: clean cartoon -->
+              <symbol id="s3" overflow="visible">
+                <g stroke="currentColor" class="st" stroke-linejoin="round" stroke-linecap="round">
+                  <path class="fill-paper" d="M-11,-108 C-18,-130 -16,-150 -9,-150 C-3,-150 -2,-128 -3,-108 Z"/>
+                  <path class="fill-paper" d="M11,-108 C18,-130 16,-150 9,-150 C3,-150 2,-128 3,-108 Z"/>
+                  <path class="st-acc" d="M-9,-112 C-12,-126 -11,-140 -9,-144 M9,-112 C12,-126 11,-140 9,-144" stroke-width="1.5"/>
+                  <path d="M-6,-36 V-10 M6,-36 V-10"/>
+                  <path class="fill-paper" d="M-12,-70 Q-20,-58 -19,-46 M12,-70 Q20,-58 19,-46"/>
+                  <path class="fill-paper" d="M-14,-36 Q-17,-64 -9,-73 H9 Q17,-64 14,-36 Z"/>
+                  <path d="M-8,-60 H8 V-48 H-8 Z M-8,-60 L-10,-72 M8,-60 L10,-72" stroke-width="1"/>
+                  <ellipse class="fill-paper" cx="0" cy="-91" rx="17" ry="18"/>
+                  <path class="fill-acc" d="M-10,-6 Q-21,-6 -20,-1 Q-20,3 -10,3 Q-1,3 -1,-2 Q-1,-7 -10,-6 Z"/>
+                  <path class="fill-acc" d="M10,-6 Q21,-6 20,-1 Q20,3 10,3 Q1,3 1,-2 Q1,-7 10,-6 Z"/>
+                </g>
+                <circle class="fill-ink" cx="-6" cy="-93" r="2.2"/>
+                <circle class="fill-ink" cx="6" cy="-93" r="2.2"/>
+                <path class="fill-acc" d="M-2.5,-86 H2.5 L0,-83 Z"/>
+                <path class="st-thin" d="M-4,-80 Q0,-82 4,-80" fill="none"/>
+              </symbol>
+              <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 Z" class="fill-ink"/>
+              </marker>
+            </defs>
+
+            <text x="20" y="32" font-size="15" font-weight="700">FIG. 1</text>
+            <text x="20" y="52" font-size="12" class="muted">PIPELINE, SIMPLIFIED. DETAILS WITHHELD.</text>
+            <text x="980" y="32" font-size="13" text-anchor="end" id="frameCount">FRAME 000000</text>
+            <text x="980" y="52" font-size="12" text-anchor="end" class="muted">24 FPS</text>
+
+            <!-- the button -->
+            <circle class="st-acc pulse" cx="70" cy="95" r="20" stroke-width="2"/>
+            <circle class="st" cx="70" cy="95" r="27"/>
+            <circle class="fill-acc" cx="70" cy="95" r="18"/>
+            <text x="70" y="140" font-size="12" font-weight="700" text-anchor="middle">PUSH</text>
+
+            <!-- signal bus -->
+            <path class="st-thin" d="M97,95 H430 M250,95 V170 M500,110 V170 M570,75 H750 V170"/>
+            <path class="st-acc flow" stroke-width="2" d="M97,95 H430 M250,95 V170 M500,110 V170 M570,75 H750 V170"/>
+            <circle class="fill-ink" cx="250" cy="95" r="4"/>
+
+            <!-- core -->
+            <rect class="st fill-paper" x="430" y="40" width="140" height="70"/>
+            <text x="500" y="66" font-size="13" font-weight="700" text-anchor="middle">TE CORE</text>
+            <rect class="fill-ink" x="452" y="78" width="40" height="9"/>
+            <rect class="fill-ink" x="498" y="78" width="22" height="9"/>
+            <rect class="fill-ink" x="526" y="78" width="22" height="9"/>
+            <text x="500" y="102" font-size="9" class="muted" text-anchor="middle">CONFIDENTIAL</text>
+
+            <!-- line floor -->
+            <path class="st" d="M0,330 H1000"/>
+            <path class="st-thin" d="M0,336 H1000" stroke-dasharray="1 9" stroke-width="3" opacity=".6"/>
+
+            <!-- moving figures -->
+            <g id="lane"></g>
+
+            <!-- stations (drawn over figures so changes happen out of sight) -->
+            <g id="stations">
+              <g>
+                <rect class="st fill-paper" x="190" y="170" width="120" height="172"/>
+                <text x="202" y="192" font-size="13" font-weight="700">01 READ</text>
+                <circle class="led" cx="296" cy="187" r="5"/>
+                <circle class="st" cx="250" cy="258" r="24"/>
+                <circle class="st-thin" cx="250" cy="258" r="10"/>
+                <path class="st-thin" d="M226,258 H274 M250,234 V282"/>
+                <text x="202" y="330" font-size="10" class="muted">STN-A</text>
+              </g>
+              <g>
+                <rect class="st fill-paper" x="440" y="170" width="120" height="172"/>
+                <text x="452" y="192" font-size="13" font-weight="700">02</text>
+                <rect class="fill-ink" x="478" y="182" width="58" height="12"/>
+                <circle class="led" cx="546" cy="187" r="5"/>
+                <circle class="fill-ink" cx="500" cy="258" r="24"/>
+                <path class="st-acc" stroke-width="1.5" d="M480,300 H520 M486,308 H514"/>
+                <text x="452" y="330" font-size="10" class="muted">STN-B</text>
+              </g>
+              <g>
+                <rect class="st fill-paper" x="690" y="170" width="120" height="172"/>
+                <text x="702" y="192" font-size="13" font-weight="700">03 DRAW</text>
+                <circle class="led" cx="796" cy="187" r="5"/>
+                <circle class="st" cx="750" cy="258" r="24"/>
+                <path class="st-acc" stroke-width="2" stroke-linecap="round" d="M738,266 Q746,240 752,258 T764,250"/>
+                <text x="702" y="330" font-size="10" class="muted">STN-C</text>
+              </g>
+            </g>
+
+            <!-- dimension line -->
+            <path class="st-thin" d="M24,372 H976" marker-start="url(#arr)" marker-end="url(#arr)"/>
+            <path class="st-thin" d="M24,362 V382 M976,362 V382"/>
+            <text x="24" y="402" font-size="12">IN: LIVE ACTION</text>
+            <text x="500" y="402" font-size="11" class="muted" text-anchor="middle">NOT TO SCALE</text>
+            <text x="976" y="402" font-size="12" text-anchor="end">OUT: ANIMATION</text>
+          </svg>
+        </div>
+        <div class="titleblock">
+          <div><small>Project</small><span>Toon Engine</span></div>
+          <div><small>Sheet</small><span>A-01</span></div>
+          <div><small>Scale</small><span>NTS</span></div>
+          <div><small>Drawn</small><span>Upon Dev</span></div>
+          <div><small>Rev</small><span>0.1 / 2026.10</span></div>
+          <div class="conf"><small>Status</small><span>Confidential</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad" aria-labelledby="pad-title">
+    <div class="wrap">
+      <div class="eyebrow">Sheet A-02 / Scratch pad</div>
+      <h2 id="pad-title">Draw something while you wait.</h2>
+      <p class="note">Your drawing stays on this screen. Nothing is saved, uploaded, or shared, and it's gone when you leave.</p>
+
+      <div class="studio">
+        <div class="canvas-box">
+          <canvas id="pad" aria-label="Drawing canvas"></canvas>
+          <div class="hint" id="hint">Draw anywhere</div>
+        </div>
+        <div class="tools">
+          <div class="group" role="group" aria-label="Tool">
+            <small>Tool</small>
+            <button type="button" id="t-pen" data-tool="pen" aria-pressed="true"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3,17 L5,12 L14,3 L17,6 L8,15 Z M5,12 L8,15" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>Pen</button>
+            <button type="button" id="t-marker" data-tool="marker" aria-pressed="false"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="2" width="6" height="11" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M7,13 L8.5,18 H11.5 L13,13" fill="currentColor"/></svg>Marker</button>
+            <button type="button" id="t-spray" data-tool="spray" aria-pressed="false"><svg viewBox="0 0 20 20" aria-hidden="true" fill="currentColor"><circle cx="5" cy="6" r="1.2"/><circle cx="10" cy="4" r="1.2"/><circle cx="14" cy="8" r="1.2"/><circle cx="7" cy="11" r="1.2"/><circle cx="12" cy="13" r="1.2"/><circle cx="5" cy="16" r="1.2"/><circle cx="15" cy="16" r="1.2"/></svg>Spray</button>
+            <button type="button" id="t-eraser" data-tool="eraser" aria-pressed="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3,13 L11,5 L16,10 L10,16 H6 Z M7,9 L12,14" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>Eraser</button>
+          </div>
+          <div class="group" role="group" aria-label="Color">
+            <small>Color</small>
+            <div class="swatches">
+              <button type="button" id="c-ink" data-color="ink" aria-label="Ink" aria-pressed="true"><span style="background:var(--ink)"></span></button>
+              <button type="button" id="c-orange" data-color="orange" aria-label="Orange" aria-pressed="false"><span style="background:var(--accent)"></span></button>
+              <button type="button" id="c-pink" data-color="pink" aria-label="Pink" aria-pressed="false"><span style="background:#FF4F9A"></span></button>
+              <button type="button" id="c-cyan" data-color="cyan" aria-label="Cyan" aria-pressed="false"><span style="background:#19B5D8"></span></button>
+              <button type="button" id="c-yellow" data-color="yellow" aria-label="Yellow" aria-pressed="false"><span style="background:#FFC93C"></span></button>
+            </div>
+          </div>
+          <div class="group">
+            <small>Edit</small>
+            <div class="actions">
+              <button type="button" id="undo">Undo</button>
+              <button type="button" id="clear">Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" aria-labelledby="contact-title">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow">Early access</div>
+        <h2 id="contact-title">Artists, studios, and press: get in touch.</h2>
+      </div>
+      <div class="mailrow">
+        <span class="email" id="email">toonengine@burnpiles.com</span>
+        <button type="button" class="btn ghost" id="copy">Copy</button>
+        <a class="btn" href="mailto:toonengine@burnpiles.com?subject=Toon%20Engine%20early%20access">Email us</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Toon Engine is a product of <a href="https://upon.dev" target="_blank" rel="noopener">Upon Dev</a>, a division of <a href="https://burnpiles.com" target="_blank" rel="noopener">Burnpiles</a>.</span>
+    <span>&copy; 2026 Burnpiles</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  /* ---------- schematic loop ---------- */
+  var NS = 'http://www.w3.org/2000/svg';
+  var lane = document.getElementById('lane');
+  var leds = document.querySelectorAll('#stations .led');
+  var frameEl = document.getElementById('frameCount');
+  var CENTERS = [250, 500, 750], SPACING = 325, SPAN = 1300, SPEED = 58, FLOOR = 330;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var figs = [];
+  for (var i = 0; i < 4; i++) {
+    var u = document.createElementNS(NS, 'use');
+    u.setAttribute('href', '#s0');
+    u.style.color = 'var(--ink)';
+    lane.appendChild(u);
+    figs.push({ el: u, stage: -1 });
+  }
+  function place(t) {
+    var busy = [false, false, false];
+    figs.forEach(function (f, i) {
+      var x = ((t * SPEED + i * SPACING) % SPAN) - 125;
+      var stage = x < CENTERS[0] ? 0 : x < CENTERS[1] ? 1 : x < CENTERS[2] ? 2 : 3;
+      if (stage !== f.stage) { f.el.setAttribute('href', '#s' + stage); f.stage = stage; }
+      var bob = reduce ? 0 : -Math.abs(Math.sin(x / 13)) * 3;
+      f.el.setAttribute('transform', 'translate(' + x.toFixed(1) + ',' + (FLOOR + bob).toFixed(1) + ')');
+      var op = x < 40 ? Math.max(0, (x + 30) / 70) : x > 940 ? Math.max(0, (1010 - x) / 70) : 1;
+      f.el.setAttribute('opacity', op.toFixed(2));
+      CENTERS.forEach(function (c, k) { if (Math.abs(x - c) < 60) busy[k] = true; });
+    });
+    leds.forEach(function (l, k) { l.classList.toggle('on', busy[k]); });
+    frameEl.textContent = 'FRAME ' + String(Math.floor(t * 24) % 1000000).padStart(6, '0');
+  }
+  if (reduce) {
+    place(0);
+  } else {
+    var t0 = null;
+    var tick = function (now) {
+      if (t0 === null) t0 = now;
+      place((now - t0) / 1000);
+      requestAnimationFrame(tick);
+    };
+    place(0);
+    requestAnimationFrame(tick);
+  }
+
+  /* ---------- scratch pad ---------- */
+  var cv = document.getElementById('pad');
+  var ctx = cv.getContext('2d');
+  var box = cv.parentElement;
+  var hint = document.getElementById('hint');
+  var COLORS = { pink: '#FF4F9A', cyan: '#19B5D8', yellow: '#FFC93C' };
+  var SIZES = { pen: 3, marker: 13, eraser: 30, spray: 18 };
+  var items = [];          // strokes and clear markers; coords normalized to canvas width
+  var cur = null, tool = 'pen', color = 'ink', W = 1, sprayTimer = null, lastPt = null, raf = 0;
+
+  function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  function resolve(c) { return c === 'ink' ? cssVar('--ink') : c === 'orange' ? cssVar('--accent') : COLORS[c]; }
+
+  function resize() {
+    var r = box.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width;
+    cv.width = Math.round(r.width * dpr);
+    cv.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    redraw();
+  }
+  function drawItem(s) {
+    var k = W / 800;
+    ctx.globalCompositeOperation = s.tool === 'eraser' ? 'destination-out' : 'source-over';
+    ctx.fillStyle = ctx.strokeStyle = s.tool === 'eraser' ? '#000' : resolve(s.color);
+    if (s.tool === 'spray') {
+      var d = 1.6 * Math.max(k, .6);
+      for (var i = 0; i < s.pts.length; i++) ctx.fillRect(s.pts[i][0] * W, s.pts[i][1] * W, d, d);
+      return;
+    }
+    var p = s.pts;
+    ctx.lineWidth = SIZES[s.tool] * Math.max(k, .5);
+    ctx.lineCap = ctx.lineJoin = 'round';
+    ctx.globalAlpha = s.tool === 'marker' ? .85 : 1;
+    ctx.beginPath();
+    ctx.moveTo(p[0][0] * W, p[0][1] * W);
+    if (p.length === 1) ctx.lineTo(p[0][0] * W + .01, p[0][1] * W);
+    for (var j = 1; j < p.length - 1; j++) {
+      var mx = (p[j][0] + p[j + 1][0]) / 2 * W, my = (p[j][1] + p[j + 1][1]) / 2 * W;
+      ctx.quadraticCurveTo(p[j][0] * W, p[j][1] * W, mx, my);
+    }
+    if (p.length > 1) ctx.lineTo(p[p.length - 1][0] * W, p[p.length - 1][1] * W);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  function redraw() {
+    raf = 0;
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    var start = 0;
+    for (var i = items.length - 1; i >= 0; i--) if (items[i].clear) { start = i + 1; break; }
+    for (var j = start; j < items.length; j++) drawItem(items[j]);
+    if (cur) drawItem(cur);
+    ctx.globalCompositeOperation = 'source-over';
+    hint.classList.toggle('gone', items.length > 0 || !!cur);
+  }
+  function schedule() { if (!raf) raf = requestAnimationFrame(redraw); }
+  function pt(e) {
+    var r = cv.getBoundingClientRect();
+    return [(e.clientX - r.left) / W, (e.clientY - r.top) / W];
+  }
+  function spray(p) {
+    var rad = SIZES.spray / 800;
+    for (var i = 0; i < 10; i++) {
+      var a = Math.random() * Math.PI * 2, d = Math.sqrt(Math.random()) * rad;
+      cur.pts.push([p[0] + Math.cos(a) * d, p[1] + Math.sin(a) * d]);
+    }
+    schedule();
+  }
+  cv.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    cv.setPointerCapture(e.pointerId);
+    lastPt = pt(e);
+    cur = { tool: tool, color: color, pts: tool === 'spray' ? [] : [lastPt] };
+    if (tool === 'spray') { spray(lastPt); sprayTimer = setInterval(function () { spray(lastPt); }, 40); }
+    schedule();
+  });
+  cv.addEventListener('pointermove', function (e) {
+    if (!cur) return;
+    lastPt = pt(e);
+    if (tool !== 'spray') cur.pts.push(lastPt);
+    schedule();
+  });
+  function end() {
+    if (!cur) return;
+    clearInterval(sprayTimer);
+    if (cur.pts.length) items.push(cur);
+    cur = null;
+    schedule();
+  }
+  cv.addEventListener('pointerup', end);
+  cv.addEventListener('pointercancel', end);
+
+  function press(sel, attr, val) {
+    document.querySelectorAll(sel).forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset[attr] === val)); });
+  }
+  document.querySelectorAll('[data-tool]').forEach(function (b) {
+    b.addEventListener('click', function () { tool = b.dataset.tool; press('[data-tool]', 'tool', tool); });
+  });
+  document.querySelectorAll('[data-color]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      color = b.dataset.color; press('[data-color]', 'color', color);
+      if (tool === 'eraser') { tool = 'pen'; press('[data-tool]', 'tool', tool); }
+    });
+  });
+  function undo() { items.pop(); schedule(); }
+  document.getElementById('undo').addEventListener('click', undo);
+  document.getElementById('clear').addEventListener('click', function () {
+    if (items.length && !items[items.length - 1].clear) { items.push({ clear: true }); schedule(); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
+  });
+  new ResizeObserver(resize).observe(box);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', schedule);
+  new MutationObserver(schedule).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  /* ---------- copy email ---------- */
+  var copyBtn = document.getElementById('copy');
+  copyBtn.addEventListener('click', function () {
+    var addr = document.getElementById('email').textContent;
+    var done = function () { copyBtn.textContent = 'Copied'; setTimeout(function () { copyBtn.textContent = 'Copy'; }, 1600); };
+    var fallback = function () {
+      var r = document.createRange(); r.selectNodeContents(document.getElementById('email'));
+      var s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      copyBtn.textContent = 'Selected';
+    };
+    try { navigator.clipboard.writeText(addr).then(done, fallback); } catch (err) { fallback(); }
+  });
+})();
+</script>
+
+</body>
+</html>
